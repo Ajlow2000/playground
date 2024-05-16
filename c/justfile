@@ -1,0 +1,13 @@
+# -------------------------------------------------
+
+# Build and execute bin from src
+run SRC: (build SRC)
+    @./bin/{{SRC}}
+
+# Build bin from src
+build SRC:
+    gcc -Wall ./src/{{SRC}}.c -o ./bin/{{SRC}}
+
+# Compile src to asm
+compile SRC:
+    gcc -Wall -S ./src/{{SRC}}.c -o ./asm/{{SRC}}.asm
