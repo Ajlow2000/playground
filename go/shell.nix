@@ -30,11 +30,4 @@ pkgs.mkShell {
     goEnv
     gomod2nix
   ];
-  shellHook = ''
-  echo "Development Environment Loaded."
-  echo ""
-  echo "    To build and run this project with errors type 'go run main.go'."
-  echo "    To test this project in it's deployment environment type 'nix run' or 'nix run . -- [args]'."
-  echo "    If you added new project dependencies (ie, 'go get <url>'), run 'gomod2nix generate' and then the above nix run command"
-  '';
 }
