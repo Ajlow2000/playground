@@ -1,2 +1,2 @@
-./c/bin/
-./ocaml/_build/
+./c/bin/*
+./ocaml/_build/*
