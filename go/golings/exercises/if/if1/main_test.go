@@ -1,7 +1,6 @@
 // if1
 // Make me compile!
 
-// I AM NOT DONE
 package main_test
 
 import "testing"
@@ -9,6 +8,11 @@ import "testing"
 func bigger(a int, b int) int {
 	// Complete this function to return the bigger number
 	// Use only if statements
+    if a > b {
+        return a
+    } else {
+        return b
+    }
 	return 0
 }
 
