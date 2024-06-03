@@ -1,3 +1,7 @@
+; 
+; What integer does this program print with arguments 3854998744 and 915131509? 
+;
+
 	.arch armv8-a
 	.file	"chall.c"
 	.text
@@ -29,7 +33,10 @@ func1:
 	.global	main
 	.type	main, %function
 main:
-	stp	x29, x30, [sp, -48]!
+	stp	x29, x30, [sp, -48]!    ; Store Pair of Registers calculates an address from 
+                                ; a base register value and an immediate offset, and 
+                                ; stores two 32-bit words or two 64-bit doublewords to 
+                                ; the calculated address, from two registers. 
 	add	x29, sp, 0
 	str	x19, [sp, 16]
 	str	w0, [x29, 44]
