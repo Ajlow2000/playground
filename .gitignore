@@ -1,5 +1,5 @@
 c/bin/*
 ocaml/_build/*
 
-*/zig-out/
-*/zig-cache/
+zig/*/zig-out/
+zig/*/zig-cache/
