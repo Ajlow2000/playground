@@ -7,6 +7,8 @@ pub fn build(b: *std.Build) void {
         .target = b.host,
     });
 
+    exe.root_module.addImport("singlyLinkedList", b.createModule(.{ .root_source_file = .{ .path = "lib/singlyLinkedList.zig" } }));
+
     b.installArtifact(exe);
 
     const run_exe = b.addRunArtifact(exe);
