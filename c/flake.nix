@@ -19,6 +19,7 @@
             # builder
             gcc
             just
+            zig
 
             # debugger
             llvm.lldb
@@ -33,6 +34,8 @@
             # other tools
             llvm.libllvm
             valgrind
+            nil
+            zls
 
             # libs
             glm
