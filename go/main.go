@@ -1,7 +1,8 @@
 package main
 
-import "fmt"
+import "github.com/Ajlow2000/playground/go/lib"
+
 
 func main()  {
-    fmt.Println("Go pg")
+    lib.FindUniqueChars()
 }
