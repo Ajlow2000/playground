@@ -1,0 +1,12 @@
+[package]
+name = "doggo"
+description = "A demo."
+homepage = "hoverbear.org"
+version = "0.1.0"
+authors = ["Ana Hobden <operator@hoverbear.org>"]
+edition = "2018"
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.53.1"
