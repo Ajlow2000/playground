@@ -12,6 +12,8 @@ rustPlatform.buildRustPackage rec {
   pname = cargoToml.package.name;
   version = cargoToml.package.version;
 
+  cargoHash = "sha256-o3uQKjvcBUu2dT+zezpKgMMS41tvwYTu8/NLQ2bdDvs=";
+
   src = ./.;
 
   #cargoSha256 = lib.fakeSha256;
