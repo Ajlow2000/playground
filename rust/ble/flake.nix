@@ -37,6 +37,7 @@
                             touch $out
                         '';
                     };
+                    integration-test = import ./tests/integration.nix { inherit pkgs self cargoToml; };
                 }
             );
             apps = forAllSystems (system: {
