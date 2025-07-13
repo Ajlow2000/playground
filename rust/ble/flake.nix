@@ -11,7 +11,6 @@
                 config = { };
             });
             cargoToml = nixpkgs.lib.importTOML ./Cargo.toml;
-
         in {
             packages = forAllSystems (system:
                 let pkgs = nixpkgsFor."${system}"; in {
@@ -19,7 +18,9 @@
                         pname = cargoToml.package.name;
                         version = cargoToml.package.version;
                         src = ./.;
-                        cargoHash = "sha256-3kzJIZw6qyvyxfyzhuPU0HwhrMJd/z4x9nOmzLfhiHo=";
+                        cargoHash = "sha256-G/fOrmpQdM+XhIXvA8bODqoEJQIgaSfPIX1iUPNyFos=";
+                        nativeBuildInputs = with pkgs; [ pkg-config ];
+                        buildInputs = with pkgs; [ dbus ];
                     };
                 }
             );
@@ -29,7 +30,9 @@
                         pname = cargoToml.package.name + "-tests";
                         version = cargoToml.package.version;
                         src = ./.;
-                        cargoHash = "sha256-3kzJIZw6qyvyxfyzhuPU0HwhrMJd/z4x9nOmzLfhiHo=";
+                        cargoHash = "sha256-G/fOrmpQdM+XhIXvA8bODqoEJQIgaSfPIX1iUPNyFos=";
+                        nativeBuildInputs = with pkgs; [ pkg-config ];
+                        buildInputs = with pkgs; [ dbus ];
                         checkPhase = ''
                             cargo test
                         '';
@@ -50,6 +53,8 @@
                 let pkgs = nixpkgsFor."${system}"; in {
                     default = pkgs.mkShell {
                         packages = with pkgs; [
+                            pkg-config
+                            dbus
                             rustc
                             cargo
                             rust-analyzer
