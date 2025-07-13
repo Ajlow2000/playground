@@ -19,7 +19,7 @@
                         pname = cargoToml.package.name;
                         version = cargoToml.package.version;
                         src = ./.;
-                        cargoHash = "sha256-EfLfPCCjy7q1sshS2/J4SGsacRtAbYVi7OOvL4UBQzw=";
+                        cargoHash = "sha256-NxPA+7Dgrfi9ecxOEtBwtOnU0SNbJnPBUA8LATQ+qy4=";
                     };
                 }
             );
@@ -29,7 +29,7 @@
                         pname = cargoToml.package.name + "-tests";
                         version = cargoToml.package.version;
                         src = ./.;
-                        cargoHash = "sha256-EfLfPCCjy7q1sshS2/J4SGsacRtAbYVi7OOvL4UBQzw=";
+                        cargoHash = "sha256-NxPA+7Dgrfi9ecxOEtBwtOnU0SNbJnPBUA8LATQ+qy4=";
                         checkPhase = ''
                             cargo test
                         '';
