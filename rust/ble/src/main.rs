@@ -37,13 +37,13 @@ async fn main() -> anyhow::Result<()> {
     while let Some(event) = events.next().await {
         match event {
             CentralEvent::DeviceDiscovered(id) => {
-                let peripheral = central.peripheral(&id).await?;
-                let properties = peripheral.properties().await?;
-                let name = properties
-                    .and_then(|p| p.local_name)
-                    .map(|local_name| format!("Name: {local_name}"))
-                    .unwrap_or_default();
-                println!("DeviceDiscovered: {:?} {}", id.to_string(), name);
+                // let peripheral = central.peripheral(&id).await?;
+                // let properties = peripheral.properties().await?;
+                // let name = properties
+                //     .and_then(|p| p.local_name)
+                //     .map(|local_name| format!("Name: {local_name}"))
+                //     .unwrap_or_default();
+                println!("DeviceDiscovered: {}", id.to_string());
             }
             CentralEvent::StateUpdate( .. ) => {
                 // println!("AdapterStatusUpdate {:?}", state);
