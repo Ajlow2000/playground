@@ -1,53 +1,62 @@
 {
-    description = "A bindgen demo.";
-
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+        nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     };
 
-    outputs = { self, nixpkgs }:
+    outputs = inputs@{ self, ... }: with inputs;
         let
-            supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
-            forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
-
-            pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-            packages = with pkgs; [
-                llvmPackages.libclang
-            ];
-
-        in
-            {
-            defaultPackage = forAllSystems (system: (import nixpkgs {
+           forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.platforms.unix;
+           nixpkgsFor = forAllSystems (system: import nixpkgs {
                 inherit system;
-                overlays = [ self.overlay ];
-            }).doggo);
+                config = { };
+            });
+            cargoToml = nixpkgs.lib.importTOML ./Cargo.toml;
 
-            overlay = final: prev: {
-                doggo = final.callPackage ./. { };
-            };
-
-            devShells.default = pkgs.mkShell {
-                buildInputs = packages;
-                # nativeBuildInputs = nativeBuildPackages;
-                shellHook = with pkgs; ''
-                        export LD_LIBRARY_PATH="${
-                    lib.makeLibraryPath libraries
-                }:$LD_LIBRARY_PATH"
-                        export OPENSSL_INCLUDE_DIR="${openssl.dev}/include/openssl"
-                        export OPENSSL_LIB_DIR="${openssl.out}/lib"
-                        export OPENSSL_ROOT_DIR="${openssl.out}"
-                        export RUST_SRC_PATH="${toolchain}/lib/rustlib/src/rust/library"
-                        export LIBCLANG_PATH="${llvmPackages.libclang.lib}/lib"
-                        export BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
-                            $(< ${stdenv.cc}/nix-support/libc-cflags) \
-                            $(< ${stdenv.cc}/nix-support/cc-cflags) \
-                            $(< ${stdenv.cc}/nix-support/libcxx-cxxflags) \
-                    ${lib.optionalString stdenv.cc.isClang "-idirafter ${stdenv.cc.cc}/lib/clang/${lib.getVersion stdenv.cc.cc}/include"} \
-                    ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"} \
-                        "
-                '';
-            };
-        };
+        in {
+            packages = forAllSystems (system:
+                let pkgs = nixpkgsFor."${system}"; in {
+                    default = pkgs.rustPlatform.buildRustPackage {
+                        pname = cargoToml.package.name;
+                        version = cargoToml.package.version;
+                        src = ./.;
+                        cargoHash = "sha256-EfLfPCCjy7q1sshS2/J4SGsacRtAbYVi7OOvL4UBQzw=";
+                    };
+                }
+            );
+            checks = forAllSystems (system:
+                let pkgs = nixpkgsFor."${system}"; in {
+                    default = pkgs.rustPlatform.buildRustPackage {
+                        pname = cargoToml.package.name + "-tests";
+                        version = cargoToml.package.version;
+                        src = ./.;
+                        cargoHash = "sha256-EfLfPCCjy7q1sshS2/J4SGsacRtAbYVi7OOvL4UBQzw=";
+                        checkPhase = ''
+                            cargo test
+                        '';
+                        installPhase = ''
+                            touch $out
+                        '';
+                    };
+                }
+            );
+            apps = forAllSystems (system: {
+                default = {
+                    type = "app";
+                    program = "${self.packages.${system}.default}/bin/${cargoToml.package.name}";
+                };
+            });
+            devShells = forAllSystems (system:
+                let pkgs = nixpkgsFor."${system}"; in {
+                    default = pkgs.mkShell {
+                        packages = with pkgs; [
+                            rustc
+                            cargo
+                            rust-analyzer
+                            libclang
+                            rustPlatform.bindgenHook
+                        ];
+                    };
+                }
+            );
+       };
 }
-
