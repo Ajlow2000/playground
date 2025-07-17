@@ -46,6 +46,11 @@ pub fn main() !void {
         std.debug.print("--string = {s}\n", .{s});
     for (res.positionals[0]) |pos|
         std.debug.print("{s}\n", .{pos});
+    
+    // Print hello world if no arguments provided
+    if (res.args.help == 0 and res.args.number == null and res.args.answer == null and res.args.string.len == 0 and res.positionals[0].len == 0) {
+        std.debug.print("Hello, World!\n", .{});
+    }
 }
 
 const clap = @import("clap");
