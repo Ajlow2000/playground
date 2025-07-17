@@ -1,13 +1,21 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
     const exe = b.addExecutable(.{
         .name = "main",
         .root_source_file = b.path("./src/main.zig"),
-        .target = b.host,
+        .target = target,
+        .optimize = optimize,
     });
 
-    exe.root_module.addImport("singlyLinkedList", b.createModule(.{ .root_source_file = .{ .path = "lib/singlyLinkedList.zig" } }));
+    exe.root_module.addImport("singlyLinkedList", b.createModule(.{ 
+        .root_source_file = b.path("lib/singlyLinkedList.zig"),
+        .target = target,
+        .optimize = optimize,
+    }));
 
     b.installArtifact(exe);
 
@@ -20,8 +28,8 @@ pub fn build(b: *std.Build) void {
 
     const unit_tests = b.addTest(.{
         .root_source_file = b.path("lib/singlyLinkedList.zig"),
-        // .root_source_file = b.path("src/main.zig"),
-        // .target = b.resolveTargetQuery(target),
+        .target = target,
+        .optimize = optimize,
     });
 
     const run_unit_tests = b.addRunArtifact(unit_tests);

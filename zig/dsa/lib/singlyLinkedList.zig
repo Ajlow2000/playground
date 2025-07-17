@@ -1,6 +1,3 @@
-//! This module provides a custom implmentation for
-//! a Singly Linked List.
-
 const std = @import("std");
 
 pub const SinglyLinkedListError = error{
@@ -56,56 +53,107 @@ pub fn SinglyLinkedList(comptime T: type) type {
             }
         }
 
-        // pub fn insertAfter(self: *SinglyLinkedList(T), n: *Node, index: i32) !void {
-        //     try self.validateInvariants();
-        //     if (index > self.len) return SinglyLinkedListError.IndexOutOfBounds;
-        //     defer self.len += 1;
-        //
-        //     var current = self.head;
-        //     var i: usize = 0;
-        //     while (i < self.len) {
-        //         if (i == index) {
-        //             n.next = current.?.next;
-        //             current.?.next = n;
-        //             if (self.head == null) self.head = n;
-        //             if (self.tail == null) self.tail = n;
-        //             return;
-        //         } else {
-        //             current = current.?.next;
-        //             i += 1;
-        //         }
-        //     }
-        //     return;
-        // }
-
-        // pub fn search(self: *SinglyLinkedList, key: usize) !void {
-        //     std.debug.print("Key: {}\n", .{key});
-        // }
-
-        pub fn get(self: *SinglyLinkedList(T), getIndex: usize) !*Node {
+        pub fn insertAfter(self: *SinglyLinkedList(T), n: *Node, index: usize) !void {
             try self.validateInvariants();
-            if (getIndex > self.len) return SinglyLinkedListError.IndexOutOfBounds;
+            if (index >= self.len) return SinglyLinkedListError.IndexOutOfBounds;
+            defer self.len += 1;
 
             var current = self.head;
             var i: usize = 0;
             while (i < self.len) {
-                if (i == getIndex) return current;
-                current = current.next;
-                i += 1;
+                if (i == index) {
+                    n.next = current.?.next;
+                    current.?.next = n;
+                    if (current == self.tail) self.tail = n;
+                    return;
+                } else {
+                    current = current.?.next;
+                    i += 1;
+                }
             }
         }
 
-        // pub fn deleteHead(self: *SinglyLinkedList) !void {
-        //     unreachable;
-        // }
-        //
-        // pub fn deleteTail(self: *SinglyLinkedList) !void {
-        //     unreachable;
-        // }
-        //
-        // pub fn delete(self: *SinglyLinkedList, key: usize) !void {
-        //     std.debug.print("Key: {}\n", .{key});
-        // }
+        pub fn search(self: *SinglyLinkedList(T), key: T) !?*Node {
+            try self.validateInvariants();
+            var current = self.head;
+            while (current != null) {
+                if (current.?.key == key) return current;
+                current = current.?.next;
+            }
+            return null;
+        }
+
+        pub fn get(self: *SinglyLinkedList(T), getIndex: usize) !*Node {
+            try self.validateInvariants();
+            if (getIndex >= self.len) return SinglyLinkedListError.IndexOutOfBounds;
+
+            var current = self.head;
+            var i: usize = 0;
+            while (i < self.len) {
+                if (i == getIndex) return current.?;
+                current = current.?.next;
+                i += 1;
+            }
+            unreachable;
+        }
+
+        pub fn deleteHead(self: *SinglyLinkedList(T)) !void {
+            try self.validateInvariants();
+            if (self.head == null) return;
+            
+            defer self.len -= 1;
+            
+            if (self.head == self.tail) {
+                self.head = null;
+                self.tail = null;
+            } else {
+                self.head = self.head.?.next;
+            }
+        }
+        
+        pub fn deleteTail(self: *SinglyLinkedList(T)) !void {
+            try self.validateInvariants();
+            if (self.tail == null) return;
+            
+            defer self.len -= 1;
+            
+            if (self.head == self.tail) {
+                self.head = null;
+                self.tail = null;
+            } else {
+                var current = self.head;
+                while (current.?.next != self.tail) {
+                    current = current.?.next;
+                }
+                current.?.next = null;
+                self.tail = current;
+            }
+        }
+        
+        pub fn delete(self: *SinglyLinkedList(T), key: T) !bool {
+            try self.validateInvariants();
+            if (self.head == null) return false;
+            
+            if (self.head.?.key == key) {
+                try self.deleteHead();
+                return true;
+            }
+            
+            var current = self.head;
+            while (current.?.next != null) {
+                if (current.?.next.?.key == key) {
+                    const nodeToDelete = current.?.next;
+                    current.?.next = nodeToDelete.?.next;
+                    if (nodeToDelete == self.tail) {
+                        self.tail = current;
+                    }
+                    self.len -= 1;
+                    return true;
+                }
+                current = current.?.next;
+            }
+            return false;
+        }
     };
 }
 
@@ -199,34 +247,32 @@ test "singlyLinkedList - insertTail" {
     try std.testing.expect(list.tail == &third);
 }
 
-// test "singlyLinkedList - insertAfter" {
-//     const SinglyLinkedListU8 = SinglyLinkedList(u8);
-//
-//     var list = SinglyLinkedListU8{};
-//     try std.testing.expect(try list.isEmpty());
-//     try std.testing.expect(list.tail == null);
-//
-//     var first = SinglyLinkedListU8.Node{ .key = 1 };
-//     var second = SinglyLinkedListU8.Node{ .key = 2 };
-//     var third = SinglyLinkedListU8.Node{ .key = 3 };
-//
-//     // try std.testing.expectError(SinglyLinkedListError.IndexOutOfBounds, try list.insertAfter(&first, 5));
-//
-//     try list.insertAfter(&first, 0);
-//     try std.testing.expect(list.len == 1);
-//     try std.testing.expect(list.head == &first);
-//     try std.testing.expect(list.tail == &first);
-//
-//     try list.insertAfter(&second, 1);
-//     try std.testing.expect(list.len == 2);
-//     try std.testing.expect(list.head == &first);
-//     try std.testing.expect(list.tail == &second);
-//
-//     try list.insertAfter(&third, 1);
-//     try std.testing.expect(list.len == 3);
-//     try std.testing.expect(list.head == &first);
-//     try std.testing.expect(list.tail == &second);
-// }
+test "singlyLinkedList - insertAfter" {
+    const SinglyLinkedListU8 = SinglyLinkedList(u8);
+
+    var list = SinglyLinkedListU8{};
+    try std.testing.expect(try list.isEmpty());
+    try std.testing.expect(list.tail == null);
+
+    var first = SinglyLinkedListU8.Node{ .key = 1 };
+    var second = SinglyLinkedListU8.Node{ .key = 2 };
+    var third = SinglyLinkedListU8.Node{ .key = 3 };
+
+    try list.insertHead(&first);
+    try std.testing.expect(list.len == 1);
+    try std.testing.expect(list.head == &first);
+    try std.testing.expect(list.tail == &first);
+
+    try list.insertAfter(&second, 0);
+    try std.testing.expect(list.len == 2);
+    try std.testing.expect(list.head == &first);
+    try std.testing.expect(list.tail == &second);
+
+    try list.insertAfter(&third, 1);
+    try std.testing.expect(list.len == 3);
+    try std.testing.expect(list.head == &first);
+    try std.testing.expect(list.tail == &third);
+}
 
 test "singleLinkedList - get" {
     const SinglyLinkedListU8 = SinglyLinkedList(u8);
@@ -242,5 +288,122 @@ test "singleLinkedList - get" {
     try list.insertHead(&second);
     try list.insertHead(&third);
 
-    try std.testing.expect(list.get(2) == third);
+    try std.testing.expect(try list.get(0) == &third);
+}
+
+test "singlyLinkedList - search" {
+    const SinglyLinkedListU8 = SinglyLinkedList(u8);
+
+    var list = SinglyLinkedListU8{};
+    try std.testing.expect(try list.isEmpty());
+
+    var first = SinglyLinkedListU8.Node{ .key = 1 };
+    var second = SinglyLinkedListU8.Node{ .key = 2 };
+    var third = SinglyLinkedListU8.Node{ .key = 3 };
+
+    try list.insertHead(&first);
+    try list.insertHead(&second);
+    try list.insertHead(&third);
+
+    try std.testing.expect(try list.search(2) == &second);
+    try std.testing.expect(try list.search(1) == &first);
+    try std.testing.expect(try list.search(3) == &third);
+    try std.testing.expect(try list.search(99) == null);
+}
+
+test "singlyLinkedList - deleteHead" {
+    const SinglyLinkedListU8 = SinglyLinkedList(u8);
+
+    var list = SinglyLinkedListU8{};
+    try std.testing.expect(try list.isEmpty());
+
+    var first = SinglyLinkedListU8.Node{ .key = 1 };
+    var second = SinglyLinkedListU8.Node{ .key = 2 };
+    var third = SinglyLinkedListU8.Node{ .key = 3 };
+
+    try list.insertHead(&first);
+    try list.insertHead(&second);
+    try list.insertHead(&third);
+
+    try std.testing.expect(list.len == 3);
+    try std.testing.expect(list.head == &third);
+
+    try list.deleteHead();
+    try std.testing.expect(list.len == 2);
+    try std.testing.expect(list.head == &second);
+
+    try list.deleteHead();
+    try std.testing.expect(list.len == 1);
+    try std.testing.expect(list.head == &first);
+    try std.testing.expect(list.tail == &first);
+
+    try list.deleteHead();
+    try std.testing.expect(list.len == 0);
+    try std.testing.expect(list.head == null);
+    try std.testing.expect(list.tail == null);
+}
+
+test "singlyLinkedList - deleteTail" {
+    const SinglyLinkedListU8 = SinglyLinkedList(u8);
+
+    var list = SinglyLinkedListU8{};
+    try std.testing.expect(try list.isEmpty());
+
+    var first = SinglyLinkedListU8.Node{ .key = 1 };
+    var second = SinglyLinkedListU8.Node{ .key = 2 };
+    var third = SinglyLinkedListU8.Node{ .key = 3 };
+
+    try list.insertTail(&first);
+    try list.insertTail(&second);
+    try list.insertTail(&third);
+
+    try std.testing.expect(list.len == 3);
+    try std.testing.expect(list.tail == &third);
+
+    try list.deleteTail();
+    try std.testing.expect(list.len == 2);
+    try std.testing.expect(list.tail == &second);
+
+    try list.deleteTail();
+    try std.testing.expect(list.len == 1);
+    try std.testing.expect(list.tail == &first);
+    try std.testing.expect(list.head == &first);
+
+    try list.deleteTail();
+    try std.testing.expect(list.len == 0);
+    try std.testing.expect(list.head == null);
+    try std.testing.expect(list.tail == null);
+}
+
+test "singlyLinkedList - delete" {
+    const SinglyLinkedListU8 = SinglyLinkedList(u8);
+
+    var list = SinglyLinkedListU8{};
+    try std.testing.expect(try list.isEmpty());
+
+    var first = SinglyLinkedListU8.Node{ .key = 1 };
+    var second = SinglyLinkedListU8.Node{ .key = 2 };
+    var third = SinglyLinkedListU8.Node{ .key = 3 };
+
+    try list.insertHead(&first);
+    try list.insertHead(&second);
+    try list.insertHead(&third);
+
+    try std.testing.expect(list.len == 3);
+    try std.testing.expect(try list.delete(99) == false);
+    try std.testing.expect(list.len == 3);
+
+    try std.testing.expect(try list.delete(2) == true);
+    try std.testing.expect(list.len == 2);
+    try std.testing.expect(try list.search(2) == null);
+
+    try std.testing.expect(try list.delete(3) == true);
+    try std.testing.expect(list.len == 1);
+    try std.testing.expect(list.head == &first);
+    try std.testing.expect(list.tail == &first);
+
+    try std.testing.expect(try list.delete(1) == true);
+    try std.testing.expect(list.len == 0);
+    try std.testing.expect(list.head == null);
+    try std.testing.expect(list.tail == null);
 }
