@@ -1,11 +1,14 @@
 const std = @import("std");
 
+const pname = "dsa";
+const version = "0.1.0";
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
     const exe = b.addExecutable(.{
-        .name = "main",
+        .name = pname,
         .root_source_file = b.path("./src/main.zig"),
         .target = target,
         .optimize = optimize,
