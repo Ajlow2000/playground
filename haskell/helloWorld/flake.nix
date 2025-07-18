@@ -44,7 +44,7 @@
               haskell-language-server
               hlint
               ormolu # code formatter
-            ];
+            ] ++ [ pkgs.xdg-utils ];
 
             shellHook = ''
               echo "Haskell development environment"
@@ -56,6 +56,11 @@
               echo "  cabal build        - Build the project"
               echo "  cabal run hello-world - Build and run the executable"
               echo "  cabal clean        - Clean build artifacts"
+              echo ""
+              echo "Book commands:"
+              echo "  open-book          - Open Real World Haskell book in browser"
+              
+              alias open-book='xdg-open http://book.realworldhaskell.org/read/index.html'
             '';
           };
         }
