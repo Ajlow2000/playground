@@ -15,4 +15,5 @@ pub fn main() !void {
     try list.insertHead(&first);
     try list.insertHead(&second);
     try list.insertHead(&third);
+    std.debug.print("list - {pretty}\n", .{list});
 }

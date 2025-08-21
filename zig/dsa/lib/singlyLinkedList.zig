@@ -154,6 +154,53 @@ pub fn SinglyLinkedList(comptime T: type) type {
             }
             return false;
         }
+
+        pub fn format(
+            self: SinglyLinkedList(T),
+            comptime fmt: []const u8,
+            options: std.fmt.FormatOptions,
+            writer: anytype,
+        ) !void {
+            _ = options;
+            
+            if (std.mem.eql(u8, fmt, "pretty")) {
+                // Pretty format with newlines
+                try writer.print("SinglyLinkedList {{\n", .{});
+                try writer.print("  len: {}\n", .{self.len});
+                try writer.print("  nodes:\n", .{});
+                
+                var current = self.head;
+                var index: usize = 0;
+                while (current) |node| {
+                    try writer.print("    [{}]: {} -> ", .{ index, node.key });
+                    if (node.next) |_| {
+                        try writer.print("next\n", .{});
+                    } else {
+                        try writer.print("null\n", .{});
+                    }
+                    current = node.next;
+                    index += 1;
+                }
+                try writer.print("}}", .{});
+            } else {
+                // Default compact format
+                try writer.print("SinglyLinkedList(len={}) {{ ", .{self.len});
+                
+                var current = self.head;
+                var first = true;
+                while (current) |node| {
+                    if (!first) {
+                        try writer.print(" -> ", .{});
+                    } else {
+                        first = false;
+                    }
+                    try writer.print("{}", .{node.key});
+                    current = node.next;
+                }
+                
+                try writer.print(" }}", .{});
+            }
+        }
     };
 }
 
