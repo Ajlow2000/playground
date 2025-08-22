@@ -18,7 +18,7 @@ pub fn SinglyLinkedList(comptime T: type) type {
         tail: ?*Node = null,
         len: usize = 0,
 
-        fn validateInvariants(self: *SinglyLinkedList(T)) !void {
+        fn validateInvariants(self: *SinglyLinkedList(T)) SinglyLinkedListError!void {
             if ((self.head == null) and (self.tail == null) and (self.len != 0)) return SinglyLinkedListError.LengthOutOfSync;
             if ((self.head == null) and (self.tail != null) and (self.len == 0)) return SinglyLinkedListError.TailOutOfSync;
             if ((self.head != null) and (self.tail == null) and (self.len == 0)) return SinglyLinkedListError.HeadOutOfSync;
