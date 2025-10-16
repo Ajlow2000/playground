@@ -2,6 +2,19 @@
 name = "hello-world"
 version = "0.1.0"
 edition = "2021"
+default-run = "pretend_cli"
+
+[[bin]]
+name = "pretend_cli"
+path = "./src/cli/main.rs"
+
+[[bin]]
+name = "pretend_plugin"
+path = "./src/plugin/main.rs"
+
+[lib]
+name = "pretend_lib"
+path = "./src/lib/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
