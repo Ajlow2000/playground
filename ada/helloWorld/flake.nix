@@ -25,6 +25,11 @@
           '';
         };
 
+        apps.default = {
+          type = "app";
+          program = "${self.packages.${system}.default}/bin/hello";
+        };
+
         devShells.default = pkgs.mkShell {
           packages = [ pkgs.gnat pkgs.gprbuild ];
         };
