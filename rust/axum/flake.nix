@@ -65,6 +65,16 @@
                             if ! pg_ctl status > /dev/null 2>&1; then
                                 pg_ctl start -W -l "$PGDATA/pg.log" -o "-k /tmp"
                             fi
+
+                            echo ""
+                            echo "Postgres is running. Stop with: pg_ctl stop"
+                            echo ""
+                            echo "Usage:"
+                            echo "  Run the server:    cargo run"
+                            echo "  Create a note:     curl -X POST http://localhost:3000/notes -H 'Content-Type: application/json' -d '{\"content\": \"my note\"}'"
+                            echo "  List all notes:    curl http://localhost:3000/notes"
+                            echo "  Postgres shell:    psql -U postgres -h /tmp"
+                            echo ""
                         '';
                     };
                 }

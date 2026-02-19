@@ -17,8 +17,9 @@ use axum::{
     extract::{FromRef, FromRequestParts, State},
     http::{request::Parts, StatusCode},
     routing::get,
-    Router,
+    Json, Router,
 };
+use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use tokio::net::TcpListener;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -46,12 +47,24 @@ async fn main() {
         .await
         .expect("can't connect to database");
 
+    // create notes table if it doesn't exist
+    sqlx::query(
+        "CREATE TABLE IF NOT EXISTS notes (
+            id SERIAL PRIMARY KEY,
+            content TEXT NOT NULL
+        )",
+    )
+    .execute(&pool)
+    .await
+    .expect("can't create notes table");
+
     // build our application with some routes
     let app = Router::new()
         .route(
             "/",
             get(using_connection_pool_extractor).post(using_connection_extractor),
         )
+        .route("/notes", get(list_notes).post(create_note))
         .with_state(pool);
 
     // run it with hyper
@@ -97,6 +110,43 @@ async fn using_connection_extractor(
         .fetch_one(&mut *conn)
         .await
         .map_err(internal_error)
+}
+
+#[derive(Serialize, sqlx::FromRow)]
+struct Note {
+    id: i32,
+    content: String,
+}
+
+#[derive(Deserialize)]
+struct CreateNote {
+    content: String,
+}
+
+async fn list_notes(
+    State(pool): State<PgPool>,
+) -> Result<Json<Vec<Note>>, (StatusCode, String)> {
+    let notes = sqlx::query_as::<_, Note>("SELECT id, content FROM notes ORDER BY id")
+        .fetch_all(&pool)
+        .await
+        .map_err(internal_error)?;
+    tracing::info!("listed {} notes", notes.len());
+    Ok(Json(notes))
+}
+
+async fn create_note(
+    State(pool): State<PgPool>,
+    Json(input): Json<CreateNote>,
+) -> Result<Json<Note>, (StatusCode, String)> {
+    let note = sqlx::query_as::<_, Note>(
+        "INSERT INTO notes (content) VALUES ($1) RETURNING id, content",
+    )
+    .bind(&input.content)
+    .fetch_one(&pool)
+    .await
+    .map_err(internal_error)?;
+    tracing::info!(id = note.id, content = %note.content, "created note");
+    Ok(Json(note))
 }
 
 /// Utility function for mapping any error into a `500 Internal Server Error`
