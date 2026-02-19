@@ -52,7 +52,20 @@
                             rustc
                             cargo
                             rust-analyzer
+                            postgresql
                         ];
+                        shellHook = ''
+                            export PGDATA="$PWD/.pg_data"
+                            export DATABASE_URL="postgres://postgres:password@localhost"
+
+                            if [ ! -d "$PGDATA" ]; then
+                                initdb --auth=md5 --username=postgres --pwfile=<(echo "password")
+                            fi
+
+                            if ! pg_ctl status > /dev/null 2>&1; then
+                                pg_ctl start -W -l "$PGDATA/pg.log" -o "-k /tmp"
+                            fi
+                        '';
                     };
                 }
             );
