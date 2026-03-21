@@ -1,0 +1,26 @@
+[package]
+name = "embassy-hello-world"
+edition = "2021"
+
+[[bin]]
+name = "embassy-hello-world"
+test = false
+bench = false
+
+[dependencies]
+esp-bootloader-esp-idf = { version = "*", features = ["esp32c6"] }
+esp-hal = { version = "=1.0.0-rc.0", features = ["esp32c6", "unstable"] }
+esp-hal-embassy = { version = "*", features = ["esp32c6"] }
+embassy-executor = { version = "*", features = ["task-arena-size-32768", "executor-thread"] }
+embassy-time = "*"
+esp-backtrace = { version = "*", features = ["esp32c6", "panic-handler", "println"] }
+esp-println = { version = "*", features = ["esp32c6", "log-04"] }
+log = "0.4"
+
+[profile.dev]
+opt-level = "s"
+
+[profile.release]
+opt-level = "s"
+codegen-units = 1
+lto = "fat"
