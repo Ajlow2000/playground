@@ -1,23 +1,26 @@
 use std::collections::VecDeque;
-use rand::Rng;
 
 #[derive(Clone, Debug)]
-enum EventType { 
-    job,
-    new_job
+enum EventType {
+    Job,
+    #[allow(dead_code)]
+    NewJob,
 }
 
 #[derive(Clone, Debug)]
 struct QMember {
+    #[allow(dead_code)]
     event_type: EventType,
+    #[allow(dead_code)]
     serial: i32,
+    #[allow(dead_code)]
     start_time: f32,
     total_time: f32,
     time_so_far: f32,
     n_slices: i32,
 }
 
-fn add_new_event(queue: &mut VecDeque<QMember>, event_type: EventType, total_time: f32, mut m_serial:i32, m_time: f32) -> i32 {
+fn add_new_event(queue: &mut VecDeque<QMember>, event_type: EventType, total_time: f32, m_serial: i32, m_time: f32) -> i32 {
     queue.push_back(QMember {
         event_type: event_type,
         serial: m_serial,
@@ -29,42 +32,42 @@ fn add_new_event(queue: &mut VecDeque<QMember>, event_type: EventType, total_tim
     m_serial + 1
 }
 
-fn list_queue(currentTime: f32, queue: &VecDeque<QMember>) {
+fn list_queue(current_time: f32, queue: &VecDeque<QMember>) {
 	let mut time_remaining: f32 = 0.0;
     for member in queue.iter() {
 		time_remaining += member.total_time - member.time_so_far;
     }
-	println!("{currentTime:7.2}	jobs: {}	remaining: {time_remaining:7.2}", queue.len(), );
+	println!("{current_time:7.2}	jobs: {}	remaining: {time_remaining:7.2}", queue.len(), );
 }
 
 fn main() {
 
 	let time_window: f32 = 1050.0;
 	let time_slice: f32 = 2.0;
-	let task_switch_overhead: f32 = 0.5; 
+	let task_switch_overhead: f32 = 0.5;
 
-    let mut m_serial: i32 = 0;  
+    let mut m_serial: i32 = 0;
     let mut m_time: f32 = 0.0;
     let mut q: VecDeque<QMember> = VecDeque::new();
-    let mut nextJobArrival: f32 = 0.0;
+    let mut next_job_arrival: f32 = 0.0;
 
-    for i in 1..10 { 
-		let runTime: f32 = rand::random_range(2.0..20.00);
-        m_serial = add_new_event(&mut q, EventType::job, runTime, m_serial, m_time);
+    for _i in 1..10 {
+		let run_time: f32 = rand::random_range(2.0..20.00);
+        m_serial = add_new_event(&mut q, EventType::Job, run_time, m_serial, m_time);
         println!("addedEvent {m_serial}");
     }
 
     list_queue(m_time, &q);
 
-	while (m_time < time_window && !q.is_empty()) {
-		if (m_time > nextJobArrival) {
-			let runTime: f32 = rand::random_range(2.0..20.00);
-			m_serial = add_new_event(&mut q, EventType::job, runTime, m_serial, m_time);
-			nextJobArrival += 20.0; 
+	while m_time < time_window && !q.is_empty() {
+		if m_time > next_job_arrival {
+			let run_time: f32 = rand::random_range(2.0..20.00);
+			m_serial = add_new_event(&mut q, EventType::Job, run_time, m_serial, m_time);
+			next_job_arrival += 20.0;
 		}
 		let mut job = q.pop_front().unwrap();
-		if ((job.total_time - job.time_so_far) > time_slice) {
-			job.time_so_far += time_slice;	
+		if (job.total_time - job.time_so_far) > time_slice {
+			job.time_so_far += time_slice;
 			job.n_slices += 1;
 			q.push_back(job);
 			m_time += time_slice + task_switch_overhead;
@@ -74,6 +77,6 @@ fn main() {
 			println!("finished job - expended {}", job.total_time);
 		}
 		list_queue(m_time, &q);
-		
+
 	}
 }
