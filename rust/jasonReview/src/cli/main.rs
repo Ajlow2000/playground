@@ -38,11 +38,11 @@ fn main() {
     let mut q: VecDeque<Event> = VecDeque::new();
     let mut next_job_arrival = Duration::ZERO;
 
-    for _i in 1..10 {
+    (0..9).for_each(|_| {
         let run_time = Duration::from_secs_f32(rand::random_range(2.0_f32..20.0));
         m_serial = add_new_event(&mut q, run_time, m_serial);
         println!("addedEvent {m_serial}");
-    }
+    });
 
     list_queue(m_time, &q);
 
