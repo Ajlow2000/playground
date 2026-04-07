@@ -1,6 +1,6 @@
 with Ada.Text_IO;
 
-procedure Hello is
+procedure Hello_World is
 begin
    Ada.Text_IO.Put_Line ("Hello, World!");
-end Hello;
+end Hello_World;

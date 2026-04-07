@@ -2,5 +2,5 @@ project Hello_World is
    for Source_Dirs use ("src");
    for Object_Dir use "obj";
    for Exec_Dir use "bin";
-   for Main use ("hello.adb");
+   for Main use ("hello_world.adb");
 end Hello_World;

@@ -1,0 +1,7 @@
+name = "hello_world"
+description = "Hello World in Ada"
+version = "0.1.0-dev"
+authors = ["ajlow"]
+maintainers = ["accounts@aleclowry.com"]
+maintainers-logins = ["ajlow"]
+licenses = "MIT"

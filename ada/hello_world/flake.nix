@@ -31,7 +31,10 @@
         };
 
         devShells.default = pkgs.mkShell {
-          packages = [ pkgs.gnat pkgs.gprbuild ];
+          packages = [ pkgs.gnat pkgs.gprbuild pkgs.alire ];
+          shellHook = ''
+            alr --non-interactive toolchain --select gnat_external
+          '';
         };
       });
 }
