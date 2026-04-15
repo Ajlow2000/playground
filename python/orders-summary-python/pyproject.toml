@@ -1,0 +1,15 @@
+[project]
+name = "orders-summary-python"
+version = "0.1.0"
+description = "A function that generates a summary of orders grouped by either day or customer"
+requires-python = ">=3.8"
+dependencies = [
+    "pytest",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["report"]

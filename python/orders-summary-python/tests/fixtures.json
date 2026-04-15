@@ -1,0 +1,68 @@
+[
+  {
+    "id": "o1",
+    "customerId": "cust_1",
+    "orderDate": "2026-01-10",
+    "lineItems": [
+      { "quantity": 1, "unitPrice": 20 },
+      { "quantity": 2, "unitPrice": 5 }
+    ]
+  },
+  {
+    "id": "o2",
+    "customerId": "cust_2",
+    "orderDate": "2026-01-10",
+    "lineItems": [
+      { "quantity": 2, "unitPrice": 10 }
+    ]
+  },
+  {
+    "id": "o3",
+    "customerId": "cust_1",
+    "orderDate": "2026-01-11",
+    "lineItems": [
+      { "quantity": 1, "unitPrice": 50 }
+    ]
+  },
+  {
+    "id": "o4",
+    "customerId": "cust_3",
+    "orderDate": "2026-01-12",
+    "lineItems": [
+      { "quantity": 3, "unitPrice": 10 }
+    ]
+  },
+  {
+    "id": "o5",
+    "customerId": "cust_2",
+    "orderDate": "2026-01-12",
+    "lineItems": [
+      { "quantity": 4, "unitPrice": 5 }
+    ]
+  },
+  {
+    "id": "o6",
+    "customerId": "cust_3",
+    "orderDate": "2026-01-13",
+    "lineItems": [
+      { "quantity": 2, "unitPrice": 30 }
+    ]
+  },
+  {
+    "id": "o7",
+    "customerId": "cust_1",
+    "orderDate": "2026-01-13",
+    "lineItems": [
+      { "quantity": 1, "unitPrice": 15 },
+      { "quantity": 1, "unitPrice": 5 }
+    ]
+  },
+  {
+    "id": "o8",
+    "customerId": "cust_2",
+    "orderDate": "2026-01-14",
+    "lineItems": [
+      { "quantity": 1, "unitPrice": 25 }
+    ]
+  }
+]
