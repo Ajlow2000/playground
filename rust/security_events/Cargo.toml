@@ -1,0 +1,8 @@
+[package]
+name = "security_events_demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+security_events = "0.1.2"
+security_core = "0.1.2"
