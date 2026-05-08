@@ -29,7 +29,11 @@
                             pkg-config
                             libusb1
                             udev
+                            # Required by nrf-mpsl-sys / nrf-sdc-sys (bindgen)
+                            llvmPackages.clang
+                            llvmPackages.libclang.lib
                         ];
+                        LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
                     };
                 }
             );
