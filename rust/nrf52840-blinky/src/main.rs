@@ -1,21 +1,23 @@
 #![no_std]
 #![no_main]
 
-use core::sync::atomic::{AtomicU8, Ordering};
 use defmt::*;
 use embassy_executor::Spawner;
 use embassy_futures::join::join4;
+use embassy_futures::select::{select, Either};
 use embassy_nrf::gpio::{Level, Output, OutputDrive, Pull};
 use embassy_nrf::gpiote::{InputChannel, InputChannelPolarity};
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
+use embassy_sync::signal::Signal;
 use embassy_time::Timer;
 use {defmt_rtt as _, panic_probe as _};
 
 #[derive(Clone, Copy, Format)]
 #[repr(u8)]
 enum BlinkState {
-    Heartbeat = 0,
-    Frenzy = 1,
-    Drowsy = 2,
+    Heartbeat = 0, // steady 500ms pulse
+    Frenzy = 1,    // rapid 100ms flash
+    Drowsy = 2,    // slow 1000ms throb
 }
 
 impl BlinkState {
@@ -28,36 +30,28 @@ impl BlinkState {
     }
 }
 
-impl From<u8> for BlinkState {
-    fn from(v: u8) -> Self {
-        match v {
-            1 => Self::Frenzy,
-            2 => Self::Drowsy,
-            _ => Self::Heartbeat,
-        }
-    }
-}
-
-static BLINK_STATE: AtomicU8 = AtomicU8::new(BlinkState::Heartbeat as u8);
+static STATE_SIGNAL: Signal<CriticalSectionRawMutex, BlinkState> = Signal::new();
 
 async fn blink_led(led: &mut Output<'_>) {
+    let mut state = BlinkState::Heartbeat;
     loop {
-        let delay_ms = BlinkState::from(BLINK_STATE.load(Ordering::Relaxed)).delay_ms();
         led.set_low();
-        Timer::after_millis(delay_ms).await;
+        match select(Timer::after_millis(state.delay_ms()), STATE_SIGNAL.wait()).await {
+            Either::First(_) => {}
+            Either::Second(new_state) => {
+                led.set_high();
+                state = new_state;
+                continue;
+            }
+        }
         led.set_high();
-        Timer::after_millis(delay_ms).await;
-    }
-}
-
-async fn watch_button(mut btn: InputChannel<'_>, led: &mut Output<'_>, id: u8) {
-    loop {
-        btn.wait_for_low().await;
-        info!("Button {} pressed", id);
-        led.set_low();
-        btn.wait_for_high().await;
-        debug!("Button {} released", id);
-        led.set_high();
+        match select(Timer::after_millis(state.delay_ms()), STATE_SIGNAL.wait()).await {
+            Either::First(_) => {}
+            Either::Second(new_state) => {
+                state = new_state;
+                continue;
+            }
+        }
     }
 }
 
@@ -70,7 +64,7 @@ async fn watch_button_state(
     loop {
         btn.wait_for_low().await;
         info!("Button {} pressed -> {}", id, state);
-        BLINK_STATE.store(state as u8, Ordering::Relaxed);
+        STATE_SIGNAL.signal(state);
         led.set_low();
         btn.wait_for_high().await;
         debug!("Button {} released", id);
@@ -82,6 +76,7 @@ async fn watch_button_state(
 async fn main(_spawner: Spawner) {
     let p = embassy_nrf::init(Default::default());
 
+    // led1 exclusively owned by blink_led — btn1 dropped
     let mut led1 = Output::new(p.P0_13, Level::High, OutputDrive::Standard);
     let mut led2 = Output::new(p.P0_14, Level::High, OutputDrive::Standard);
     let mut led3 = Output::new(p.P0_15, Level::High, OutputDrive::Standard);
