@@ -26,6 +26,8 @@ impl ParseCallbacks for RenameEnumVariants {
 
 fn main() {
     println!("cargo:rerun-if-changed=compass_dir.h");
+    println!("cargo:rerun-if-changed=compass_dir.c");
+    cc::Build::new().file("compass_dir.c").opt_level(1).compile("compass_dir");
     let bindings = bindgen::Builder::default()
         .header("compass_dir.h")
         .rustified_enum("compass_dir_t")
