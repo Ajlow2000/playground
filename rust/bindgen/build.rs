@@ -4,15 +4,14 @@ use bindgen::callbacks::{EnumVariantValue, ItemInfo, ParseCallbacks};
 use std::env;
 use std::path::PathBuf;
 
+include!("build_helpers/rename_callbacks.rs");
+
 #[derive(Debug)]
 struct RenameEnumVariants;
 
 impl ParseCallbacks for RenameEnumVariants {
     fn item_name(&self, item: ItemInfo<'_>) -> Option<String> {
-        match item.name {
-            "compass_dir_t" => Some("CompassDir".to_string()),
-            _ => None,
-        }
+        rename_type(item.name)
     }
 
     fn enum_variant_name(
@@ -21,19 +20,7 @@ impl ParseCallbacks for RenameEnumVariants {
         original_variant_name: &str,
         _variant_value: EnumVariantValue,
     ) -> Option<String> {
-        // Strip the "COMPASS_" prefix and convert to PascalCase: "COMPASS_NORTH" -> "North"
-        let rustified_variant_name = original_variant_name
-            .split('_')
-            .skip(1) // drop "COMPASS"
-            .map(|part| {
-                let mut chars = part.chars();
-                match chars.next() {
-                    None => String::new(),
-                    Some(first) => first.to_uppercase().collect::<String>() + &chars.as_str().to_lowercase(),
-                }
-            })
-            .collect::<String>();
-        Some(rustified_variant_name)
+        rename_variant(original_variant_name)
     }
 }
 

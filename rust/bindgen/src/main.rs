@@ -14,6 +14,9 @@ fn describe(dir: CompassDir) -> &'static str {
     }
 }
 
+#[cfg(test)]
+include!("../build_helpers/rename_callbacks.rs");
+
 fn main() {
     let dir = CompassDir::North;
     println!("direction: {:?} ({})", dir, describe(dir));
