@@ -2,7 +2,7 @@
 mod bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
-use bindings::compass_dir_t as CompassDir;
+use bindings::CompassDir;
 
 fn describe(dir: CompassDir) -> &'static str {
     match dir {

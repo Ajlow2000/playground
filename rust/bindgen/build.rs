@@ -1,6 +1,6 @@
 extern crate bindgen;
 
-use bindgen::callbacks::{EnumVariantValue, ParseCallbacks};
+use bindgen::callbacks::{EnumVariantValue, ItemInfo, ParseCallbacks};
 use std::env;
 use std::path::PathBuf;
 
@@ -8,6 +8,13 @@ use std::path::PathBuf;
 struct RenameEnumVariants;
 
 impl ParseCallbacks for RenameEnumVariants {
+    fn item_name(&self, item: ItemInfo<'_>) -> Option<String> {
+        match item.name {
+            "compass_dir_t" => Some("CompassDir".to_string()),
+            _ => None,
+        }
+    }
+
     fn enum_variant_name(
         &self,
         _enum_name: Option<&str>,
