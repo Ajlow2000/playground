@@ -6,16 +6,16 @@ use bindings::compass_dir_t as CompassDir;
 
 fn describe(dir: CompassDir) -> &'static str {
     match dir {
-        CompassDir::COMPASS_NORTH   => "north",
-        CompassDir::COMPASS_EAST    => "east",
-        CompassDir::COMPASS_SOUTH   => "south",
-        CompassDir::COMPASS_WEST    => "west",
-        CompassDir::COMPASS_INVALID => "invalid",
+        CompassDir::North   => "north",
+        CompassDir::East    => "east",
+        CompassDir::South   => "south",
+        CompassDir::West    => "west",
+        CompassDir::Invalid => "invalid",
     }
 }
 
 fn main() {
-    let dir = CompassDir::COMPASS_NORTH;
+    let dir = CompassDir::North;
     println!("direction: {:?} ({})", dir, describe(dir));
 
     println!("raw value: {}", dir as u32);
