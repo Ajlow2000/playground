@@ -40,7 +40,10 @@
 
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
-          buildInputs = [ pkgs.rust-bin.nightly.latest.default ];
+          buildInputs = [ 
+            pkgs.rust-bin.nightly.latest.default 
+            pkgs.cargo-generate
+          ];
         };
       });
     };
