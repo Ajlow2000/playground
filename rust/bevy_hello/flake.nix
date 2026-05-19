@@ -16,13 +16,13 @@
                 pkg-config
             ];
             commonBuildInputs = pkgs: with pkgs; [
-                udev 
-                alsa-lib-with-plugins 
+                udev
+                alsa-lib-with-plugins
                 vulkan-loader
-                xorg.libX11 
-                xorg.libXcursor 
-                xorg.libXi 
-                xorg.libXrandr
+                libx11
+                libxcursor
+                libxi
+                libxrandr
                 libxkbcommon
                 wayland
             ];
@@ -72,6 +72,7 @@
                             cargo
                             rust-analyzer
                         ] ++ (commonNativeBuildInputs pkgs) ++ (commonBuildInputs pkgs);
+                        LD_LIBRARY_PATH = nixpkgs.lib.makeLibraryPath (commonBuildInputs pkgs);
                     };
                 }
             );
