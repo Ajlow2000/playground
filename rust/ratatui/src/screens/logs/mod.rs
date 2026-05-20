@@ -1,6 +1,7 @@
 use ratatui::Frame;
 use ratatui::layout::Rect;
-use tui_logger::{TuiLoggerSmartWidget, TuiWidgetEvent, TuiWidgetState};
+use ratatui::style::{Color, Style};
+use tui_logger::{TuiLoggerLevelOutput, TuiLoggerSmartWidget, TuiWidgetEvent, TuiWidgetState};
 
 pub struct LogsModel {
     pub widget_state: TuiWidgetState,
@@ -25,6 +26,18 @@ pub fn update(model: &mut LogsModel, msg: LogsMessage) {
 }
 
 pub fn view(model: &LogsModel, frame: &mut Frame, area: Rect) {
-    let widget = TuiLoggerSmartWidget::default().state(&model.widget_state);
+    let widget = TuiLoggerSmartWidget::default()
+        .state(&model.widget_state)
+        .output_separator('·')
+        .output_timestamp(Some("%H:%M:%S%.3f".to_string()))
+        .output_level(Some(TuiLoggerLevelOutput::Long))
+        .output_target(true)
+        .output_file(false)
+        .output_line(false)
+        .style_error(Style::default().fg(Color::Red))
+        .style_warn(Style::default().fg(Color::Yellow))
+        .style_info(Style::default().fg(Color::Cyan))
+        .style_debug(Style::default().fg(Color::Green))
+        .style_trace(Style::default().fg(Color::Magenta));
     frame.render_widget(widget, area);
 }
